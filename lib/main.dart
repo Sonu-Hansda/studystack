@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studystack/blocs/authentication/auth_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_state.dart';
+import 'package:studystack/blocs/resource/resource_bloc.dart';
 import 'package:studystack/firebase_options.dart';
 import 'package:studystack/respositories/authentication.dart';
 import 'package:studystack/respositories/database.dart';
@@ -48,9 +49,12 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(
+          BlocProvider<AuthenticationBloc>(
             create: (context) => AuthenticationBloc(
                 authenticationRepository: authenticationRepository),
+          ),
+          BlocProvider<ResourceBloc>(
+            create: (context) => ResourceBloc(),
           ),
         ],
         child: MaterialApp(
@@ -126,9 +130,10 @@ class SplashScreen extends StatelessWidget {
       body: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) {
           if (state is AuthenticationAuthenticated) {
-            Navigator.pushReplacementNamed(context, '/');
+            Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
           } else if (state is AuthenticationUnauthenticated) {
-            Navigator.pushReplacementNamed(context, '/login');
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/login', (route) => false);
           }
         },
         child: Center(
