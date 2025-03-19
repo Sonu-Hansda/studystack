@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_event.dart';
 import 'package:studystack/blocs/authentication/auth_state.dart';
+import 'package:studystack/widgets/custom_snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,9 +47,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
-        if (state is AuthenticationFailure) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.error)));
+        if (state is AuthenticationMessage) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            CustomSnackBar.info(
+              message: state.message,
+            ),
+          );
         }
         if (state is AuthenticationAuthenticated) {
           Navigator.pushReplacementNamed(context, '/');
@@ -87,57 +90,57 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                Container(
-                  alignment: Alignment.center,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, state) {
-                      if (state is AuthenticationLoading) {
-                        return const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        );
-                      } else {
-                        return GestureDetector(
-                          onTap: () {
-                            context.read<AuthenticationBloc>().add(
-                                  AuthenticationGoogleSignInRequested(),
-                                );
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Brand(Brands
-                                  .google), // Assuming you have this widget
-                              const SizedBox(width: 10),
-                              Text(
-                                'Continue with Google',
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    'or continue with',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-                const SizedBox(height: 20),
+                // Container(
+                //   alignment: Alignment.center,
+                //   padding:
+                //       const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                //   decoration: BoxDecoration(
+                //     color: Colors.grey.shade200,
+                //     borderRadius: BorderRadius.circular(12),
+                //   ),
+                //   child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                //     builder: (context, state) {
+                //       if (state is AuthenticationLoading) {
+                //         return const SizedBox(
+                //           height: 20,
+                //           width: 20,
+                //           child: CircularProgressIndicator(
+                //             strokeWidth: 2,
+                //           ),
+                //         );
+                //       } else {
+                //         return GestureDetector(
+                //           onTap: () {
+                //             context.read<AuthenticationBloc>().add(
+                //                   AuthenticationGoogleSignInRequested(),
+                //                 );
+                //           },
+                //           child: Row(
+                //             mainAxisAlignment: MainAxisAlignment.center,
+                //             mainAxisSize: MainAxisSize.min,
+                //             children: [
+                //               Brand(Brands
+                //                   .google), // Assuming you have this widget
+                //               const SizedBox(width: 10),
+                //               Text(
+                //                 'Continue with Google',
+                //                 style: Theme.of(context).textTheme.bodyLarge,
+                //               ),
+                //             ],
+                //           ),
+                //         );
+                //       }
+                //     },
+                //   ),
+                // ),
+                // const SizedBox(height: 20),
+                // Center(
+                //   child: Text(
+                //     'or continue with',
+                //     style: Theme.of(context).textTheme.bodyLarge,
+                //   ),
+                // ),
+                // const SizedBox(height: 20),
                 TextField(
                   controller: emailController,
                   decoration: const InputDecoration(
@@ -151,12 +154,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: 'Password',
                     suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            showPassword = !showPassword;
-                          });
-                        },
-                        icon: const Icon(Icons.visibility)),
+                      onPressed: () {
+                        setState(() {
+                          showPassword = !showPassword;
+                        });
+                      },
+                      icon: Icon(showPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),

@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_event.dart';
 import 'package:studystack/blocs/authentication/auth_state.dart';
+import 'package:studystack/enums/message_type.dart';
+import 'package:studystack/widgets/custom_snackbar.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -93,179 +95,195 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Image.asset(
-                  'assets/placeholder.jpg',
-                  height: 200,
-                ),
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        if (state is AuthenticationMessage) {
+          if (state.type == MessageType.success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackBar.success(
+                message:
+                    'A verification email has been sent to your email address. Please verify to log in.',
               ),
-              const SizedBox(height: 30),
-              Center(
-                child: Text(
-                  'Create an Account',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                  textAlign: TextAlign.center,
-                ),
+            );
+            Navigator.pop(context);
+          } else if (state.type == MessageType.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackBar.error(
+                message: state.message,
               ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  'Sign up to start your journey with StudyStack.',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 32),
-              TextFormField(
-                controller: fullnameController,
-                decoration: InputDecoration(hintText: 'Full Name'),
-                validator: _validateFullName,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(hintText: 'Email Address'),
-                validator: _validateEmail,
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  hintText: 'Select Branch',
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                ),
-                items: ['ECM', 'CSE', 'ME', 'EE', 'CE', 'ECE', 'MME', 'PIE']
-                    .map((branch) {
-                  return DropdownMenuItem<String>(
-                    value: branch,
-                    child: Text(
-                      branch,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    branch = value;
-                  });
-                },
-                validator: _validateBranch,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: passwordController,
-                obscureText: !showPassword,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      showPassword ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        showPassword = !showPassword;
-                      });
-                    },
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Image.asset(
+                    'assets/placeholder.jpg',
+                    height: 200,
                   ),
                 ),
-                validator: _validatePassword,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: confirmPasswordController,
-                obscureText: !showConfirmPassword,
-                decoration: InputDecoration(
-                  hintText: 'Confirm Password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      showConfirmPassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        showConfirmPassword = !showConfirmPassword;
-                      });
-                    },
-                  ),
-                ),
-                validator: _validateConfirmPassword,
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, state) {
-                    if (state is AuthenticationLoading) {
-                      return OutlinedButton(
-                        onPressed: null,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.grey[900],
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      );
-                    } else {
-                      return OutlinedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            context.read<AuthenticationBloc>().add(
-                                  AuthenticationRegisterRequested(
-                                      fullname: fullnameController.text,
-                                      email: emailController.text,
-                                      password: passwordController.text),
-                                );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content:
-                                      Text('Form submitted successfully!')),
-                            );
-                          }
-                        },
-                        child: Text(
-                          'Sign Up',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+                const SizedBox(height: 30),
+                Center(
                   child: Text(
-                    'Already have an account? Login',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade800,
+                    'Create an Account',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    'Sign up to start your journey with StudyStack.',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                TextFormField(
+                  controller: fullnameController,
+                  decoration: InputDecoration(hintText: 'Full Name'),
+                  validator: _validateFullName,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(hintText: 'Email Address'),
+                  validator: _validateEmail,
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    hintText: 'Select Branch',
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  ),
+                  items: ['ECM', 'CSE', 'ME', 'EE', 'CE', 'ECE', 'MME', 'PIE']
+                      .map((branch) {
+                    return DropdownMenuItem<String>(
+                      value: branch,
+                      child: Text(
+                        branch,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      branch = value;
+                    });
+                  },
+                  validator: _validateBranch,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: !showPassword,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        !showPassword ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          showPassword = !showPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  validator: _validatePassword,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: confirmPasswordController,
+                  obscureText: !showConfirmPassword,
+                  decoration: InputDecoration(
+                    hintText: 'Confirm Password',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        !showConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          showConfirmPassword = !showConfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  validator: _validateConfirmPassword,
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                    builder: (context, state) {
+                      if (state is AuthenticationLoading) {
+                        return OutlinedButton(
+                          onPressed: null,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.grey[900],
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return OutlinedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              context.read<AuthenticationBloc>().add(
+                                    AuthenticationRegisterRequested(
+                                        fullname: fullnameController.text,
+                                        email: emailController.text,
+                                        password: passwordController.text),
+                                  );
+                            }
+                          },
+                          child: Text(
+                            'Sign Up',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Already have an account? Login',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade800,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
