@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_event.dart';
 import 'package:studystack/blocs/authentication/auth_state.dart';
+import 'package:studystack/enums/message_type.dart';
 import 'package:studystack/respositories/authentication.dart';
 
 class AuthenticationBloc
@@ -12,12 +13,7 @@ class AuthenticationBloc
   AuthenticationBloc(
       {required AuthenticationRepository authenticationRepository})
       : _authenticationRepository = authenticationRepository,
-        super(
-          authenticationRepository.currentUser != null
-              ? AuthenticationAuthenticated(
-                  user: authenticationRepository.currentUser!)
-              : AuthenticationUnauthenticated(),
-        ) {
+        super(AuthenticationInitial()) {
     _userStream = _authenticationRepository.userChanges;
     on<AuthenticationUserChanged>(_onUserChanged);
     on<AuthenticationLogoutRequested>(_onLogoutRequested);
@@ -27,10 +23,35 @@ class AuthenticationBloc
     _userStream.listen((user) => add(AuthenticationUserChanged(user)));
   }
 
-  void _onUserChanged(
-      AuthenticationUserChanged event, Emitter<AuthenticationState> emit) {
-    if (event.user != null) {
-      emit(AuthenticationAuthenticated(user: event.user!));
+  Future<void> _onUserChanged(AuthenticationUserChanged event,
+      Emitter<AuthenticationState> emit) async {
+    final user = event.user;
+
+    if (user != null) {
+      if (!user.emailVerified) {
+        await user.sendEmailVerification();
+
+        emit(AuthenticationMessage(
+          message:
+              'A verification email has been sent to your email address. Please verify your email to continue.',
+          type: MessageType.normal,
+        ));
+        await _authenticationRepository.signOut();
+        emit(AuthenticationUnauthenticated());
+        return;
+      }
+
+      final appUser = await _authenticationRepository.getCurrentAppUser();
+      if (appUser != null) {
+        emit(AuthenticationAuthenticated(user: user, appUser: appUser));
+      } else {
+        emit(AuthenticationMessage(
+          message: 'Failed to load user data. Please try again.',
+          type: MessageType.error,
+        ));
+        await _authenticationRepository.signOut();
+        emit(AuthenticationUnauthenticated());
+      }
     } else {
       emit(AuthenticationUnauthenticated());
     }
@@ -70,7 +91,8 @@ class AuthenticationBloc
             errorMessage = error.message ?? errorMessage;
         }
       }
-      emit(AuthenticationFailure(error: errorMessage));
+      emit(AuthenticationMessage(
+          message: errorMessage, type: MessageType.error));
     }
   }
 
@@ -81,7 +103,8 @@ class AuthenticationBloc
       await _authenticationRepository.signInWithGoogle();
     } catch (error) {
       String errorMessage = 'Authentication failed. Please try again.';
-      emit(AuthenticationFailure(error: errorMessage));
+      emit(AuthenticationMessage(
+          message: errorMessage, type: MessageType.error));
     }
   }
 
@@ -99,7 +122,8 @@ class AuthenticationBloc
       if (error is FirebaseAuthException) {
         errorMessage = error.message ?? errorMessage;
       }
-      emit(AuthenticationFailure(error: errorMessage));
+      emit(AuthenticationMessage(
+          message: errorMessage, type: MessageType.error));
     }
   }
 }
