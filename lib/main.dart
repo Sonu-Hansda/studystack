@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studystack/blocs/authentication/auth_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_state.dart';
-import 'package:studystack/blocs/resource/resource_bloc.dart';
+import 'package:studystack/blocs/subject_notes/subject_notes_bloc.dart';
 import 'package:studystack/firebase_options.dart';
-import 'package:studystack/respositories/authentication.dart';
-import 'package:studystack/respositories/database.dart';
+import 'package:studystack/repositories/authentication.dart';
+import 'package:studystack/repositories/database.dart';
 import 'package:studystack/screens/authentication/login_screen.dart';
 import 'package:studystack/screens/authentication/signup_screen.dart';
 import 'package:studystack/screens/home/add_subject_screen.dart';
@@ -53,8 +53,8 @@ class MyApp extends StatelessWidget {
             create: (context) => AuthenticationBloc(
                 authenticationRepository: authenticationRepository),
           ),
-          BlocProvider<ResourceBloc>(
-            create: (context) => ResourceBloc(),
+          BlocProvider<SubjectsNotesBloc>(
+            create: (context) => SubjectsNotesBloc(),
           ),
         ],
         child: MaterialApp(

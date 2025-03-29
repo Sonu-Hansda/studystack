@@ -268,13 +268,11 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData selectedIcon = Icons.book;
     bool isLoading = false;
 
-    // Get the current user's branch and admission year from the bloc
     final state = context.read<AuthenticationBloc>().state;
     String branchCode = '';
     if (state is AuthenticationAuthenticated) {
       final user = state.appUser;
       if (user.branch != null && user.admissionYear != null) {
-        // Extract branch code from full branch name
         final branchWords = user.branch!.split(' ');
         branchCode = branchWords.map((word) => word[0]).join('').toUpperCase();
         branchCode = '$branchCode${user.admissionYear}';
@@ -474,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: selectedIcon,
                           );
                           // Update the parent widget's state
-                          this.setState(() {
+                          setState(() {
                             _subjects.add(newSubject);
                           });
                           Navigator.pop(context);

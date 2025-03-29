@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:studystack/blocs/resource/resource_event.dart';
+import 'package:studystack/blocs/subject_notes/subject_notes_bloc.dart';
+import 'package:studystack/blocs/subject_notes/subject_notes_event.dart';
+import 'package:studystack/blocs/subject_notes/subject_notes_state.dart';
 import 'package:uuid/uuid.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:studystack/models/note.dart';
 import 'package:studystack/widgets/custom_snackbar.dart';
-import 'package:studystack/blocs/resource/resource_bloc.dart';
-import 'package:studystack/blocs/resource/resource_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddNoteDialog extends StatefulWidget {
@@ -95,12 +95,8 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
       );
 
       // Add note to subject
-      context.read<ResourceBloc>().add(
-            AddNoteRequested(
-              subjectId: widget.subjectId,
-              label: note.label,
-              filePath: note.filePath,
-            ),
+      context.read<SubjectsNotesBloc>().add(
+            AddNote(note, widget.subjectId),
           );
 
       if (mounted) {
@@ -125,24 +121,24 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ResourceBloc, ResourceState>(
+    return BlocListener<SubjectsNotesBloc, SubjectsNotesState>(
       listener: (context, state) {
-        if (state is ResourceLoading) {
+        if (state is NotesLoading) {
           setState(() {
             _isLoading = true;
           });
-        } else if (state is NoteAdded) {
+        } else if (state is NotesLoaded) {
           setState(() {
             _isLoading = false;
           });
-          Navigator.pop(context, state.note);
-        } else if (state is ResourceError) {
+          Navigator.pop(context);
+        } else if (state is OperationError) {
           setState(() {
             _isLoading = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
             CustomSnackBar.error(
-              message: state.message,
+              message: state.error,
             ),
           );
         }

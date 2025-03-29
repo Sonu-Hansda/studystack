@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:studystack/main.dart';
-import 'package:studystack/respositories/authentication.dart';
-import 'package:studystack/respositories/database.dart';
+import 'package:studystack/repositories/authentication.dart';
+import 'package:studystack/repositories/database.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

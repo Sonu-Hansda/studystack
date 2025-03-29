@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:studystack/blocs/authentication/auth_event.dart';
 import 'package:studystack/blocs/authentication/auth_state.dart';
 import 'package:studystack/enums/message_type.dart';
-import 'package:studystack/respositories/authentication.dart';
+import 'package:studystack/repositories/authentication.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {

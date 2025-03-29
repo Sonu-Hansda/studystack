@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:studystack/models/app_user.dart';
-import 'package:studystack/respositories/database.dart';
+import 'package:studystack/repositories/database.dart';
 
 class AuthenticationRepository {
   final FirebaseAuth _firebaseAuth;
