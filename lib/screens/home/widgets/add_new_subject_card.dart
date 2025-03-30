@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:studystack/models/subject.dart';
 
-Widget buildSubjectCard({
+Widget buildAddNewSubjectCard({
   required BuildContext context,
-  required Subject subject,
-  required Function(BuildContext, Subject) onTap,
+  required VoidCallback onTap,
 }) {
   return Card(
     elevation: 4,
@@ -13,7 +11,7 @@ Widget buildSubjectCard({
       borderRadius: BorderRadius.circular(16),
     ),
     child: InkWell(
-      onTap: () => onTap(context, subject),
+      onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -23,8 +21,8 @@ Widget buildSubjectCard({
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              subject.color.withAlpha(100),
-              subject.color,
+              Colors.grey[400]!,
+              Colors.grey[600]!,
             ],
           ),
         ),
@@ -32,21 +30,19 @@ Widget buildSubjectCard({
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              subject.icon,
+              Icons.add_circle_outline,
               size: 40,
               color: Colors.white,
             ),
             const SizedBox(height: 8),
             Text(
-              subject.label,
+              'Add New Subject',
               style: GoogleFonts.poppins(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
               textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
