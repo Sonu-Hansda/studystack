@@ -10,9 +10,7 @@ import 'package:studystack/repositories/authentication.dart';
 import 'package:studystack/repositories/database.dart';
 import 'package:studystack/screens/authentication/login_screen.dart';
 import 'package:studystack/screens/authentication/signup_screen.dart';
-import 'package:studystack/screens/home/add_subject_screen.dart';
 import 'package:studystack/screens/home/home_screen.dart';
-import 'package:studystack/screens/home/search_screen.dart';
 import 'package:studystack/screens/profile/profile_screen.dart';
 
 void main() async {
@@ -109,9 +107,7 @@ class MyApp extends StatelessWidget {
           routes: {
             '/': (context) => HomeScreen(),
             '/splash': (context) => SplashScreen(),
-            '/search': (context) => SearchScreen(),
             '/profile': (context) => ProfileScreen(),
-            '/add-subject': (context) => AddSubjectScreen(),
             '/login': (context) => LoginScreen(),
             '/sign-up': (context) => SignupScreen(),
           },
