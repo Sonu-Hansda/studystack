@@ -90,11 +90,9 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
       final note = Note(
         label: _labelController.text,
         filePath: targetPath,
-        uploadedBy: 'Current User', // TODO: Get actual user name
+        uploadedBy: 'Current User',
         uploadedAt: DateTime.now(),
       );
-
-      // Add note to subject
       context.read<SubjectsNotesBloc>().add(
             AddNote(note, widget.subjectId),
           );
